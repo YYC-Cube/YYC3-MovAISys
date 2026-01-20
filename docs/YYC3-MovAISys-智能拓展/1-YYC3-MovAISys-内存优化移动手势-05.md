@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢内存优化布局移动手势
+# YYC³ MovAISys-内存优化布局移动手势
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

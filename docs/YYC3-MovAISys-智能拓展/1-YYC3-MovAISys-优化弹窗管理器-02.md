@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢优化弹窗管理器
+# YYC³ MovAISys-优化弹窗管理器
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

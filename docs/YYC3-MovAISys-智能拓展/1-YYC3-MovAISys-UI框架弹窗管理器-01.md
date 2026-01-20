@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢UI框架奠基工程 弹窗管理器核心类
+# YYC³ MovAISys-UI框架弹窗管理器
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

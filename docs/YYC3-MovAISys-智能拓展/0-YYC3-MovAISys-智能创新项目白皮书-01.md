@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢智能创新项目白皮书
+# YYC³ MovAISys-智能创新项目白皮书
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢UI框架奠基工程初始化
+# YYC³ MovAISys-UI框架奠基工程初始化
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

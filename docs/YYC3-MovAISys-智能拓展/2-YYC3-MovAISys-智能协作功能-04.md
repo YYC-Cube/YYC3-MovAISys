@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢通信协议量子计算进化系统
+# YYC³ MovAISys-智能协作功能系统
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

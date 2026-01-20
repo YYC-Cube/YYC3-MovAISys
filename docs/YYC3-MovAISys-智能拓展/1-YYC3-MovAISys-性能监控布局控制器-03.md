@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢性能监控布局控制器
+# YYC³ MovAISys-性能监控布局控制器
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

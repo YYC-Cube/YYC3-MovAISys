@@ -148,13 +148,13 @@ bun run type-check
 ├── core/                      # 核心引擎
 │   ├── adapters/              # 模型适配器 (OpenAI, Anthropic, Azure, Custom)
 │   ├── ai/                    # AI智能体系统
-│   │   ├── agents/           # 智能体实现 (Assistant, Behavior, Content, Layout, Monitoring)
-│   │   ├── AgentManager.ts   # 智能体管理器
-│   │   └── BaseAgent.ts     # 智能体基类
+│   │   ├── agents/            # 智能体实现 (Assistant, Behavior, Content, Layout, Monitoring)
+│   │   ├── AgentManager.ts    # 智能体管理器
+│   │   └── BaseAgent.ts       # 智能体基类
 │   ├── learning/              # 学习系统
-│   │   ├── PatternRecognizer.ts    # 模式识别
-│   │   ├── FeedbackAnalyzer.ts     # 反馈分析
-│   │   └── LearningSystem.ts      # 学习系统
+│   │   ├── PatternRecognizer.ts  # 模式识别
+│   │   ├── FeedbackAnalyzer.ts   # 反馈分析
+│   │   └── LearningSystem.ts     # 学习系统
 │   ├── error-handler/        # 错误处理系统
 │   ├── event-dispatcher/     # 事件分发器
 │   ├── message-bus/          # 消息总线
@@ -163,7 +163,7 @@ bun run type-check
 │   ├── tools/                # 工具系统
 │   ├── task-scheduler/       # 任务调度
 │   ├── cache/                # 缓存系统
-│   ├── knowledge-base/        # 知识库
+│   ├── knowledge-base/       # 知识库
 │   ├── monitoring/           # 性能监控
 │   ├── analytics/            # 分析引擎
 │   ├── security/             # 安全中心
@@ -172,42 +172,42 @@ bun run type-check
 │   ├── multimodal/           # 多模态融合
 │   ├── edge-intelligence/    # 边缘智能
 │   ├── federated-learning/   # 联邦学习
-│   ├── closed-loop/         # 闭环系统
+│   ├── closed-loop/          # 闭环系统
 │   ├── cognitive/            # 认知建模
 │   ├── emotional/            # 情感智能
 │   ├── neurolinguistic/      # 神经语言解码
-│   ├── causal/              # 因果AI
-│   ├── neuromorphic/        # 神经形态计算
-│   ├── bci/                # 脑机接口
-│   ├── holographic/         # 全息界面
-│   ├── adaptive/            # 自适应系统
-│   ├── evolution/           # 自进化AI
-│   ├── crm/                # 客户关系管理
-│   ├── marketing/           # 营销智能
-│   ├── operations/          # 运维智能
+│   ├── causal/               # 因果AI
+│   ├── neuromorphic/         # 神经形态计算
+│   ├── bci/                  # 脑机接口
+│   ├── holographic/          # 全息界面
+│   ├── adaptive/             # 自适应系统
+│   ├── evolution/            # 自进化AI
+│   ├── crm/                  # 客户关系管理
+│   ├── marketing/            # 营销智能
+│   ├── operations/           # 运维智能
 │   ├── integrations/         # 行业集成
-│   └── ui/                  # UI系统
+│   └── ui/                   # UI系统
 │       ├── ChatInterface.ts
 │       ├── IntelligentAIWidget.ts
 │       ├── ToolboxPanel.ts
-│       └── widget/         # 浮窗组件
-├── tests/                   # 测试文件
-│   ├── unit/               # 单元测试
-│   └── integration/        # 集成测试
-├── docs/                    # 项目文档
+│       └── widget/           # 浮窗组件
+├── tests/                    # 测试文件
+│   ├── unit/                 # 单元测试
+│   └── integration/          # 集成测试
+├── docs/                     # 项目文档
 │   └── YYC3-MovAISys-云枢智能/
-├── public/                  # 静态资源
-├── .github/                # GitHub配置
-│   └── workflows/          # CI/CD工作流
-├── .env.example            # 环境变量示例
-├── .gitignore             # Git忽略配置
-├── Dockerfile.backend     # 后端Docker配置
-├── docker-compose.dev.yml # 开发环境编排
-├── docker-compose.prod.yml # 生产环境编排
-├── package.json           # 项目配置
-├── tsconfig.json         # TypeScript配置
-├── vitest.config.ts      # 测试配置
-└── README.md             # 项目说明
+├── public/                   # 静态资源
+├── .github/                  # GitHub配置
+│   └── workflows/            # CI/CD工作流
+├── .env.example              # 环境变量示例
+├── .gitignore                # Git忽略配置
+├── Dockerfile.backend        # 后端Docker配置
+├── docker-compose.dev.yml    # 开发环境编排
+├── docker-compose.prod.yml   # 生产环境编排
+├── package.json              # 项目配置
+├── tsconfig.json             # TypeScript配置
+├── vitest.config.ts          # 测试配置
+└── README.md                 # 项目说明
 ```
 
 ## 📚 核心模块文档

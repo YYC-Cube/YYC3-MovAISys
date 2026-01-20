@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢通信协议云同步与扩展
+# YYC³ MovAISys-云同步与扩展
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来

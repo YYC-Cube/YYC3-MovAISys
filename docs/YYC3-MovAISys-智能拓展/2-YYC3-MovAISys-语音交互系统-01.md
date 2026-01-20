@@ -1,4 +1,4 @@
-# YYC³ MovAISys-云枢通信协议语音交互系统
+# YYC³ MovAISys-语音交互系统
 
 > ***YanYuCloudCube***
 > **标语**：言启象限 | 语枢未来
