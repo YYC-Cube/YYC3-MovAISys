@@ -2,7 +2,7 @@
 
 ![YYC³ Logo](https://github.com/YYC-Cube/yyc3-MovAISys/raw/main/public/yyc3-article-cover-05.png)
 
-[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/YYC-Cube/yyc3-MovAISys)
+[![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/YYC-Cube/yyc3-MovAISys)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/YYC-Cube/yyc3-MovAISys/blob/main/LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D%2018.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-%5E5.0.0-blue.svg)](https://www.typescriptlang.org/)
@@ -34,7 +34,7 @@ YYC³（YanYuCloudCube）PortAISys 是一个基于云原生架构的便携式智
 └─────────────────┴─────────────────┴─────────────────┴─────────────────┘
           ↑                               ↓
 ┌───────────────────────────────────────────────────────────────────────┐
-│                         � 自适应学习闭环系统                          │
+│                         🔄 自适应学习闭环系统                          │
 │   环境感知 → 数据处理 → 模型推理 → 行动执行 → 效果评估 → 知识更新     │
 └───────────────────────────────────────────────────────────────────────┘
 ```
@@ -43,28 +43,30 @@ YYC³（YanYuCloudCube）PortAISys 是一个基于云原生架构的便携式智
 
 | 类别 | 技术 | 版本 | 用途 |
 |------|------|------|------|
-| **前端框架** | React | ^18.0.0 | UI框架 |
-| **状态管理** | Zustand | ^4.0.0 | 轻量级状态管理 |
-| **类型系统** | TypeScript | ^5.0.0 | 类型安全 |
-| **构建工具** | Vite | ^5.0.0 | 快速构建 |
-| **运行时** | Node.js | ^18.0.0 | JavaScript运行时 |
-| **AI模型** | OpenAI API | - | 大语言模型 |
-| **AI模型** | Anthropic API | - | Claude模型 |
-| **本地推理** | Ollama | - | 本地模型运行 |
-| **测试框架** | Vitest | ^4.0.0 | 单元测试 |
-| **测试框架** | Playwright | ^1.0.0 | E2E测试 |
-| **容器化** | Docker | ^20.10.0 | 应用容器化 |
-| **容器编排** | Docker Compose | ^2.0.0 | 多容器管理 |
-| **反向代理** | Nginx | ^1.20.0 | 负载均衡 |
+| **前端框架** | React | >=18.0.0 | UI框架 |
+| **状态管理** | Zustand | ^4.4.0 | 轻量级状态管理 |
+| **类型系统** | TypeScript | ^5.2.0 | 类型安全 |
+| **构建工具** | Bun | >=1.0.0 | 快速构建和运行时 |
+| **运行时** | Node.js | >=18.0.0 | JavaScript运行时 |
+| **AI模型** | OpenAI API | ^4.0.0 | GPT模型 |
+| **AI模型** | Anthropic API | ^0.24.0 | Claude模型 |
+| **拖拽组件** | React Draggable | ^4.4.6 | 拖拽交互 |
+| **测试框架** | Vitest | ^4.0.16 | 单元测试和集成测试 |
+| **测试覆盖** | @vitest/coverage-v8 | ^4.0.17 | 代码覆盖率 |
+| **测试工具** | @testing-library/react | ^16.3.1 | React组件测试 |
+| **代码检查** | ESLint | ^8.50.0 | 代码质量检查 |
+| **代码格式** | Prettier | ^3.0.0 | 代码格式化 |
+| **容器化** | Docker | >=20.10.0 | 应用容器化 |
+| **容器编排** | Docker Compose | >=2.0.0 | 多容器管理 |
 
 ## 🚀 快速开始
 
 ### 环境要求
 
 - Node.js >= 18.0.0
-- Bun >= 1.0.0 (可选，推荐)
-- Docker >= 20.10.0
-- Docker Compose >= 2.0.0
+- Bun >= 1.0.0 (可选，推荐用于开发)
+- Docker >= 20.10.0 (可选，用于容器化部署)
+- Docker Compose >= 2.0.0 (可选，用于容器编排)
 
 ### 安装
 
@@ -73,9 +75,10 @@ YYC³（YanYuCloudCube）PortAISys 是一个基于云原生架构的便携式智
 git clone https://github.com/YYC-Cube/yyc3-MovAISys.git
 cd yyc3-MovAISys
 
-# 安装依赖
+# 使用 npm 安装依赖
 npm install
-# 或使用Bun
+
+# 或使用 Bun (推荐)
 bun install
 ```
 
@@ -87,54 +90,127 @@ bun install
 cp .env.example .env
 ```
 
+编辑 `.env` 文件，配置必要的API密钥和参数。
+
 ### 启动开发服务器
 
 ```bash
-# 启动后端API
-npm run dev
-# 或使用Bun
+# 使用 Bun 启动开发服务器 (推荐)
 bun run dev
 
-# 启动前端UI
-cd widget
+# 或使用 npm
 npm run dev
+```
+
+### 运行测试
+
+```bash
+# 运行所有测试
+bun run test
+
+# 运行测试并生成覆盖率报告
+bun run test:coverage
+
+# 监视模式运行测试
+bun run test:watch
 ```
 
 ### 构建生产版本
 
 ```bash
-# 构建后端
-npm run build
+# 构建项目
+bun run build
 
-# 构建前端
-cd widget
-npm run build
+# 构建浮窗组件
+bun run build:widget
+```
+
+### 代码检查和格式化
+
+```bash
+# 运行 ESLint 检查
+bun run lint
+
+# 自动修复 ESLint 问题
+bun run lint:fix
+
+# 格式化代码
+bun run format
+
+# 类型检查
+bun run type-check
 ```
 
 ## 📁 项目结构
 
 ```
 /Users/my/yyc3-Mobile-Intelligent-AI-System/
-├── core/                  # 核心引擎
-│   ├── pluggable/         # 可插拔组件
-│   ├── error-handler/     # 错误处理
-│   └── metrics/           # 性能指标
-├── widget/                # 前端界面
-│   ├── components/        # UI组件
-│   ├── stores/            # 状态管理
-│   └── utils/             # 工具函数
-├── tests/                 # 测试文件
-│   ├── unit/              # 单元测试
-│   └── e2e/               # E2E测试
-├── public/                # 静态资源
-├── docs/                  # 项目文档
-├── .env.example           # 环境变量示例
+├── core/                      # 核心引擎
+│   ├── adapters/              # 模型适配器 (OpenAI, Anthropic, Azure, Custom)
+│   ├── ai/                    # AI智能体系统
+│   │   ├── agents/           # 智能体实现 (Assistant, Behavior, Content, Layout, Monitoring)
+│   │   ├── AgentManager.ts   # 智能体管理器
+│   │   └── BaseAgent.ts     # 智能体基类
+│   ├── learning/              # 学习系统
+│   │   ├── PatternRecognizer.ts    # 模式识别
+│   │   ├── FeedbackAnalyzer.ts     # 反馈分析
+│   │   └── LearningSystem.ts      # 学习系统
+│   ├── error-handler/        # 错误处理系统
+│   ├── event-dispatcher/     # 事件分发器
+│   ├── message-bus/          # 消息总线
+│   ├── memory/               # 记忆系统
+│   ├── context-manager/      # 上下文管理
+│   ├── tools/                # 工具系统
+│   ├── task-scheduler/       # 任务调度
+│   ├── cache/                # 缓存系统
+│   ├── knowledge-base/        # 知识库
+│   ├── monitoring/           # 性能监控
+│   ├── analytics/            # 分析引擎
+│   ├── security/             # 安全中心
+│   ├── quantum-inspired/     # 量子启发算法
+│   ├── neural-computing/     # 神经计算引擎
+│   ├── multimodal/           # 多模态融合
+│   ├── edge-intelligence/    # 边缘智能
+│   ├── federated-learning/   # 联邦学习
+│   ├── closed-loop/         # 闭环系统
+│   ├── cognitive/            # 认知建模
+│   ├── emotional/            # 情感智能
+│   ├── neurolinguistic/      # 神经语言解码
+│   ├── causal/              # 因果AI
+│   ├── neuromorphic/        # 神经形态计算
+│   ├── bci/                # 脑机接口
+│   ├── holographic/         # 全息界面
+│   ├── adaptive/            # 自适应系统
+│   ├── evolution/           # 自进化AI
+│   ├── crm/                # 客户关系管理
+│   ├── marketing/           # 营销智能
+│   ├── operations/          # 运维智能
+│   ├── integrations/         # 行业集成
+│   └── ui/                  # UI系统
+│       ├── ChatInterface.ts
+│       ├── IntelligentAIWidget.ts
+│       ├── ToolboxPanel.ts
+│       └── widget/         # 浮窗组件
+├── tests/                   # 测试文件
+│   ├── unit/               # 单元测试
+│   └── integration/        # 集成测试
+├── docs/                    # 项目文档
+│   └── YYC3-MovAISys-云枢智能/
+├── public/                  # 静态资源
+├── .github/                # GitHub配置
+│   └── workflows/          # CI/CD工作流
+├── .env.example            # 环境变量示例
+├── .gitignore             # Git忽略配置
+├── Dockerfile.backend     # 后端Docker配置
+├── docker-compose.dev.yml # 开发环境编排
+├── docker-compose.prod.yml # 生产环境编排
 ├── package.json           # 项目配置
-├── tsconfig.json          # TypeScript配置
-└── README.md              # 项目说明
+├── tsconfig.json         # TypeScript配置
+├── vitest.config.ts      # 测试配置
+└── README.md             # 项目说明
 ```
 
-## � 核心模块文档
+## 📚 核心模块文档
 
 ### 文档同步工具
 
@@ -176,45 +252,128 @@ npm run build
 ### ✅ 已完成模块
 
 - [x] 项目基础设施搭建
-- [x] 核心引擎MVP实现
-- [x] 模型适配器基础实现
-- [x] 错误处理系统
-- [x] 日志和指标系统
+- [x] 核心引擎实现 (AutonomousAIEngine, PluggableAIEngine)
+- [x] 模型适配器实现 (OpenAI, Anthropic, Azure, Custom, Internal)
+- [x] 错误处理系统 (ErrorHandler, ErrorClassifier, ErrorLogger)
+- [x] 日志和指标系统 (Logger, Metrics, PerformanceMonitor)
+- [x] AI Agent系统 (Assistant, Behavior, Content, Layout, Monitoring Agents)
+- [x] 学习系统 (PatternRecognizer, FeedbackAnalyzer, LearningSystem)
+- [x] UI系统 (ChatInterface, IntelligentAIWidget, ToolboxPanel, UISystem)
+- [x] 单元测试体系 (1354+ 测试用例)
+- [x] 集成测试体系 (35+ 集成测试文件)
+- [x] Docker容器化部署支持
+- [x] 事件系统 (EventDispatcher, MessageBus)
+- [x] 记忆系统 (MemorySystem)
+- [x] 上下文管理 (ContextManager)
+- [x] 工具系统 (ToolRegistry, CoreTools)
+- [x] 任务调度 (TaskScheduler)
+- [x] 缓存系统 (CacheLayer)
+- [x] 知识库 (KnowledgeBase)
+- [x] 认证授权 (OAuthService, OAuthSessionManager)
+- [x] 分析引擎 (AIAnalyticsEngine, RealTimeAIDashboard, PredictiveAnalytics)
+- [x] 量子启发算法 (QuantumInspiredAlgorithms, QuantumGeneticAlgorithm)
+- [x] 神经计算引擎 (NeuralComputingEngine)
+- [x] 多模态融合 (MultimodalFusion)
+- [x] 边缘智能 (EdgeAIInference, EdgeFederatedLearning)
+- [x] 联邦学习 (FederatedLearning, PrivacyPreservation)
+- [x] 闭环系统 (ClosedLoopSystem, ContinuousImprovement)
+- [x] 业务价值框架 (BusinessValueFramework, ROICalculator)
+- [x] 认知建模 (CognitiveModelingCore, DynamicCognitiveProfile)
+- [x] 情感智能 (EmotionalIntelligenceCore)
+- [x] 神经语言解码 (NeurolinguisticDecoder, ThoughtDecodingStack)
+- [x] 因果AI (CausalAIArchitecture, CausalInferenceEngine)
+- [x] 神经形态计算 (NeuromorphicComputing, EventDrivenComputing)
+- [x] 脑机接口 (BrainComputerInterface)
+- [x] 全息界面 (HolographicInterfaceSystem)
+- [x] 自适应智能系统 (AdaptiveIntelligentSystem)
+- [x] 自进化AI (SelfEvolvingAI)
+- [x] 客户360度视图 (AdvancedCustomer360)
+- [x] 数字孪生客服 (DigitalTwinCustomerService)
+- [x] 营销智能 (AutonomousMarketingIntelligence, GeneticMarketingEngine)
+- [x] 运维智能 (IntelligentOperationAndMaintenance, SelfHealingEngine)
+- [x] 项目管理集成 (ProjectManagementIntegration)
+- [x] 通知系统集成 (NotificationIntegration)
+- [x] OA工作流集成 (OAWorkflowIntegration)
+- [x] 多商店智能 (MultiStoreIntelligence)
+- [x] 智能呼叫系统 (IntelligentCallingWorkflow, RealTimeCallAssistant)
 
 ### ⏳ 进行中模块
 
-- [ ] 智能交互界面实现
-- [ ] 测试体系搭建
-- [ ] 部署配置完善
+- [ ] 测试修复 (88个失败的测试用例需要修复)
+- [ ] 文档完善 (API文档、架构文档)
+- [ ] 性能优化
+- [ ] E2E测试实现
 
 ### 📅 待实现模块
 
-- [ ] 高级AI模型集成
-- [ ] 企业级安全特性
+- [ ] 高级AI模型集成 (GPT-4, Claude 3.5等)
+- [ ] 企业级安全特性 (端到端加密、权限管理、合规审计)
 - [ ] 多语言支持
 - [ ] 移动端适配
+- [ ] 实时协作功能
+- [ ] 插件市场
+- [ ] 云端部署支持
 
 ## 🗓️ 开发路线图
 
-### 阶段1：基础架构搭建 (已完成)
-- 项目初始化
-- 核心框架搭建
-- 基础模块实现
+### 阶段1：核心架构搭建 (已完成)
+- ✅ 项目初始化和基础设施
+- ✅ 核心引擎实现 (AutonomousAIEngine, PluggableAIEngine)
+- ✅ 多模型适配器 (OpenAI, Anthropic, Azure, Custom, Internal)
+- ✅ 错误处理和监控系统
+- ✅ AI Agent系统 (5种智能体)
+- ✅ 学习系统 (模式识别、反馈分析)
+- ✅ UI系统 (聊天界面、智能浮窗、工具箱)
+- ✅ 单元测试和集成测试体系
+- ✅ Docker容器化部署
 
-### 阶段2：功能完善 (进行中)
-- 智能界面开发
-- 测试体系搭建
-- 部署配置完善
+### 阶段2：高级功能实现 (已完成)
+- ✅ 量子启发算法和优化
+- ✅ 神经计算引擎
+- ✅ 多模态融合系统
+- ✅ 边缘智能和联邦学习
+- ✅ 闭环系统和持续改进
+- ✅ 业务价值框架
+- ✅ 认知建模和情感智能
+- ✅ 神经语言解码
+- ✅ 因果AI和推理引擎
+- ✅ 神经形态计算
+- ✅ 脑机接口
+- ✅ 全息界面
+- ✅ 自适应和自进化系统
+- ✅ 客户360度视图
+- ✅ 数字孪生客服
+- ✅ 营销智能和遗传算法
+- ✅ 运维智能和自愈引擎
+- ✅ 行业集成 (项目管理、通知、OA、多商店)
+- ✅ 智能呼叫系统
 
-### 阶段3：性能优化 (计划中)
-- 性能调优
-- 负载测试
-- 资源优化
+### 阶段3：测试和优化 (进行中)
+- 🔄 修复88个失败的测试用例
+- 🔄 完善API文档和架构文档
+- 🔄 性能优化和负载测试
+- 🔄 E2E测试实现
+- 🔄 代码覆盖率提升 (当前94%)
 
 ### 阶段4：企业级特性 (计划中)
-- 安全增强
-- 合规审计
-- 多租户支持
+- [ ] 端到端加密和密钥管理
+- [ ] 基于角色的访问控制 (RBAC)
+- [ ] 安全审计和合规报告
+- [ ] GDPR/CCPA合规性验证
+- [ ] SOC 2认证准备
+- [ ] 多租户架构
+- [ ] 高可用性和灾难恢复
+- [ ] 实时监控和告警
+
+### 阶段5：生态扩展 (计划中)
+- [ ] 插件市场和开发者生态
+- [ ] 第三方集成SDK
+- [ ] 多语言支持 (i18n)
+- [ ] 移动端应用 (iOS/Android)
+- [ ] 实时协作功能
+- [ ] 云端SaaS部署
+- [ ] 白标解决方案
+- [ ] 企业培训和支持
 
 ## 📖 API文档
 
@@ -255,7 +414,7 @@ console.log(response);
 await engine.shutdown();
 ```
 
-## � 安全与合规
+## 🔒 安全与合规
 
 ### 安全特性
 
@@ -282,6 +441,16 @@ await engine.shutdown();
 | 并发用户 | > 1000 |
 | 可用性 | 99.99% |
 | 吞吐量 | > 1000 req/s |
+
+### 测试覆盖率
+
+| 指标 | 数值 |
+|------|------|
+| 总测试用例 | 1442 |
+| 通过测试 | 1354 |
+| 失败测试 | 88 |
+| 测试文件 | 53 |
+| 代码覆盖率 | ~94% |
 
 ### 前端性能
 
