@@ -1,15 +1,48 @@
 import { EventEmitter } from 'events';
 
+export enum SyncMode {
+  IMMEDIATE = 'immediate',
+  SCHEDULED = 'scheduled',
+  MANUAL = 'manual'
+}
+
+export enum SyncStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  FAILED = 'failed'
+}
+
+export enum ConflictResolutionStrategy {
+  LAST_WRITE_WINS = 'last_write_wins',
+  FIRST_WRITE_WINS = 'first_write_wins',
+  MERGE = 'merge',
+  MANUAL = 'manual'
+}
+
+export interface StateSyncConfig {
+  enableAutoSync: boolean;
+  syncInterval: number;
+  conflictResolution: ConflictResolutionStrategy;
+  enableHistory: boolean;
+  maxHistorySize: number;
+  enableCompression?: boolean;
+}
+
 export interface SyncOptions {
-  conflictStrategy?: 'last_write_wins' | 'merge' | 'manual';
-  syncMode?: 'immediate' | 'scheduled' | 'manual';
+  conflictStrategy?: ConflictResolutionStrategy;
+  syncMode?: SyncMode;
   priority?: 'low' | 'normal' | 'high';
 }
 
 export interface SyncResult {
   success: boolean;
   syncId: string;
+  sourceModule: string;
+  targetModule: string;
   duration: number;
+  status?: SyncStatus;
+  conflictDetected?: boolean;
   conflict?: Conflict;
   resolvedState?: any;
 }
@@ -29,6 +62,12 @@ export interface SyncHistoryRecord {
   conflict?: Conflict;
   resolvedState: any;
   timestamp: Date;
+}
+
+export interface StateSnapshot {
+  id: string;
+  timestamp: Date;
+  states: Map<string, any>;
 }
 
 export interface StateSyncMetrics {
@@ -91,16 +130,19 @@ export class ConflictResolver {
   async resolve(
     currentState: any,
     newState: any,
-    strategy: 'last_write_wins' | 'merge' | 'manual' = 'last_write_wins'
+    strategy: ConflictResolutionStrategy = ConflictResolutionStrategy.LAST_WRITE_WINS
   ): Promise<any> {
     switch (strategy) {
-      case 'last_write_wins':
+      case ConflictResolutionStrategy.LAST_WRITE_WINS:
         return this.resolveLastWriteWins(currentState, newState);
       
-      case 'merge':
+      case ConflictResolutionStrategy.FIRST_WRITE_WINS:
+        return this.resolveFirstWriteWins(currentState, newState);
+      
+      case ConflictResolutionStrategy.MERGE:
         return await this.resolveMerge(currentState, newState);
       
-      case 'manual':
+      case ConflictResolutionStrategy.MANUAL:
         return await this.resolveManual(currentState, newState);
       
       default:
@@ -110,6 +152,10 @@ export class ConflictResolver {
 
   private resolveLastWriteWins(currentState: any, newState: any): any {
     return newState;
+  }
+
+  private resolveFirstWriteWins(currentState: any, newState: any): any {
+    return currentState;
   }
 
   private async resolveMerge(currentState: any, newState: any): Promise<any> {
@@ -134,6 +180,7 @@ export class ConflictResolver {
 export class SyncScheduler {
   private scheduledSyncs: Map<string, NodeJS.Timeout> = new Map();
   private eventBus: EventEmitter;
+  private isRunningFlag: boolean = false;
 
   constructor(eventBus: EventEmitter) {
     this.eventBus = eventBus;
@@ -170,11 +217,29 @@ export class SyncScheduler {
     }
     this.scheduledSyncs.clear();
   }
+
+  isRunning(): boolean {
+    return this.isRunningFlag;
+  }
+
+  start(): void {
+    this.isRunningFlag = true;
+  }
+
+  stop(): void {
+    this.isRunningFlag = false;
+    this.cancelAllSyncs();
+  }
 }
 
 export class MonitoringService {
   private syncMetrics: StateSyncMetrics[] = [];
   private syncErrors: StateSyncErrorMetrics[] = [];
+  private getModulesSize: () => number;
+
+  constructor(getModulesSize: () => number = () => 0) {
+    this.getModulesSize = getModulesSize;
+  }
 
   recordStateSync(metrics: StateSyncMetrics): void {
     this.syncMetrics.push(metrics);
@@ -198,6 +263,7 @@ export class MonitoringService {
     failedSyncs: number;
     conflictRate: number;
     averageDuration: number;
+    registeredModules: number;
   } {
     const totalSyncs = this.syncMetrics.length;
     const successfulSyncs = this.syncMetrics.filter(m => m.success).length;
@@ -214,7 +280,8 @@ export class MonitoringService {
       successfulSyncs,
       failedSyncs,
       conflictRate,
-      averageDuration
+      averageDuration,
+      registeredModules: this.getModulesSize()
     };
   }
 
@@ -230,13 +297,250 @@ export class StateSyncManager {
   private syncScheduler: SyncScheduler;
   private monitoring: MonitoringService;
   private eventBus: EventEmitter;
+  private config: StateSyncConfig;
+  private modules: Map<string, any> = new Map();
+  private isInitialized: boolean = false;
+  private autoSyncInterval: NodeJS.Timeout | null = null;
 
-  constructor() {
+  constructor(config: StateSyncConfig) {
+    this.config = config;
     this.stateStore = new StateStore();
     this.conflictResolver = new ConflictResolver();
     this.eventBus = new EventEmitter();
     this.syncScheduler = new SyncScheduler(this.eventBus);
-    this.monitoring = new MonitoringService();
+    this.monitoring = new MonitoringService(() => this.modules.size);
+  }
+
+  async initialize(): Promise<void> {
+    if (this.isInitialized) {
+      return;
+    }
+
+    await this.stateStore.clear();
+    this.modules.clear();
+    this.isInitialized = true;
+
+    if (this.config.enableAutoSync) {
+      this.startAutoSync();
+    }
+  }
+
+  async shutdown(): Promise<void> {
+    if (!this.isInitialized) {
+      return;
+    }
+
+    if (this.autoSyncInterval) {
+      clearInterval(this.autoSyncInterval);
+      this.autoSyncInterval = null;
+    }
+
+    this.syncScheduler.stop();
+
+    await this.clear();
+    this.isInitialized = false;
+  }
+
+  async registerModule(moduleName: string, module: any): Promise<void> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', { moduleName });
+    }
+
+    if (this.modules.has(moduleName)) {
+      throw new StateSyncError('模块已注册', { moduleName });
+    }
+
+    this.modules.set(moduleName, module);
+
+    if (module.getState) {
+      const state = await module.getState();
+      await this.stateStore.set(moduleName, state);
+    }
+  }
+
+  async unregisterModule(moduleName: string): Promise<void> {
+    if (!this.isInitialized) {
+      return;
+    }
+
+    this.modules.delete(moduleName);
+    await this.stateStore.delete(moduleName);
+  }
+
+  async sync(sourceModule: string, targetModule: string, options: SyncOptions = {}): Promise<SyncResult> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', { sourceModule, targetModule });
+    }
+
+    const source = this.modules.get(sourceModule);
+    if (!source) {
+      throw new StateSyncError('源模块不存在', { sourceModule });
+    }
+
+    const target = this.modules.get(targetModule);
+    if (!target) {
+      throw new StateSyncError('目标模块不存在', { targetModule });
+    }
+
+    const state = await source.getState();
+    return await this.syncState(sourceModule, targetModule, state, options);
+  }
+
+  async syncAll(options: SyncOptions = {}): Promise<SyncResult[]> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', {});
+    }
+
+    const results: SyncResult[] = [];
+    const moduleNames = Array.from(this.modules.keys());
+
+    if (moduleNames.length === 0) {
+      return results;
+    }
+
+    const sourceModule = moduleNames[0];
+
+    for (let i = 1; i < moduleNames.length; i++) {
+      try {
+        const result = await this.sync(sourceModule, moduleNames[i], options);
+        results.push(result);
+      } catch (error) {
+        results.push({
+          success: false,
+          syncId: this.generateSyncId(),
+          sourceModule,
+          targetModule: moduleNames[i],
+          duration: 0,
+          status: SyncStatus.FAILED,
+          conflictDetected: false,
+          resolvedState: null
+        });
+      }
+    }
+
+    return results;
+  }
+
+  async getModuleState(moduleName: string): Promise<any> {
+    if (!this.isInitialized) {
+      return null;
+    }
+
+    const state = await this.stateStore.get(moduleName);
+    return state !== undefined ? state : null;
+  }
+
+  async setModuleState(moduleName: string, state: any): Promise<void> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', { moduleName });
+    }
+
+    await this.stateStore.set(moduleName, state);
+
+    const module = this.modules.get(moduleName);
+    if (module && module.setState) {
+      await module.setState(state);
+    }
+
+    await this.publishStateChangeEvent(moduleName, state);
+  }
+
+  async createSnapshot(): Promise<StateSnapshot & { modules: any }> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', {});
+    }
+
+    const states = await this.stateStore.getAll();
+    const modules: any = {};
+    
+    for (const [key, value] of states.entries()) {
+      if (!key.startsWith('sync_history_') && !key.startsWith('dependencies_')) {
+        modules[key] = value;
+      }
+    }
+
+    return {
+      id: this.generateSyncId(),
+      timestamp: new Date(),
+      states,
+      modules
+    };
+  }
+
+  async restoreSnapshot(snapshot: StateSnapshot | any): Promise<void> {
+    if (!this.isInitialized) {
+      throw new StateSyncError('管理器未初始化', {});
+    }
+
+    const states = snapshot.states || snapshot.modules || {};
+
+    for (const [moduleName, state] of Object.entries(states)) {
+      await this.stateStore.set(moduleName, state);
+
+      const module = this.modules.get(moduleName);
+      if (module && module.setState) {
+        await module.setState(state);
+      }
+    }
+  }
+
+  async getSyncHistory(sourceModule?: string, targetModule?: string): Promise<SyncHistoryRecord[]> {
+    if (!this.isInitialized) {
+      return [];
+    }
+
+    const history: SyncHistoryRecord[] = [];
+    const keys = await this.stateStore.getKeys();
+    const historyKeys = keys.filter(key => key.startsWith('sync_history_'));
+
+    for (const key of historyKeys) {
+      const record = await this.stateStore.get(key);
+      if (record) {
+        history.push(record);
+      }
+    }
+
+    history.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+    let filteredHistory = history;
+
+    if (sourceModule) {
+      filteredHistory = filteredHistory.filter(record => record.sourceModule === sourceModule);
+    }
+
+    if (targetModule) {
+      filteredHistory = filteredHistory.filter(record => record.targetModule === targetModule);
+    }
+
+    if (this.config.maxHistorySize > 0) {
+      return filteredHistory.slice(0, this.config.maxHistorySize);
+    }
+
+    return filteredHistory;
+  }
+
+  async resetMetrics(): Promise<void> {
+    if (!this.isInitialized) {
+      return;
+    }
+
+    this.monitoring.clear();
+  }
+
+  private startAutoSync(): void {
+    if (this.autoSyncInterval) {
+      clearInterval(this.autoSyncInterval);
+    }
+
+    this.syncScheduler.start();
+
+    this.autoSyncInterval = setInterval(async () => {
+      try {
+        await this.syncAll();
+      } catch (error) {
+        this.eventBus.emit('sync:error', { error });
+      }
+    }, this.config.syncInterval);
   }
 
   async syncState(
@@ -264,6 +568,11 @@ export class StateSyncManager {
 
       await this.stateStore.set(targetModule, resolvedState);
 
+      const target = this.modules.get(targetModule);
+      if (target && target.setState) {
+        await target.setState(resolvedState);
+      }
+
       await this.publishStateChangeEvent(targetModule, resolvedState);
 
       await this.recordSyncHistory({
@@ -289,7 +598,11 @@ export class StateSyncManager {
       return {
         success: true,
         syncId,
+        sourceModule,
+        targetModule,
         duration,
+        status: SyncStatus.COMPLETED,
+        conflictDetected: !!conflict,
         conflict,
         resolvedState
       };
